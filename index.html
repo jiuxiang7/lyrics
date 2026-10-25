@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f3eee4">
+  <meta name="color-scheme" content="light">
+  <title>填词格 · 逐字填词工作台</title>
+  <meta name="description" content="输入原词，自动生成逐字空格。中列逐字对照并标出末二字韵母，右列填词，标点可改，可手动加格、删格，原词栏可收起。">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23262420'/%3E%3Ctext x='32' y='44' font-family='Georgia,serif' font-size='34' text-anchor='middle' fill='%23f3eee4'%3E%E8%AF%8D%3C/text%3E%3Crect x='45' y='46' width='6' height='6' fill='%23b14634'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient ambient-a" aria-hidden="true"></div>
+  <div class="ambient ambient-b" aria-hidden="true"></div>
+
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-seal" aria-hidden="true">
+          <span>词</span>
+          <i></i>
+        </div>
+        <div class="brand-copy">
+          <p class="brand-kicker">LYRIC GRID</p>
+          <h1>填词格</h1>
+          <p class="brand-motto">一字一格，旧词新声</p>
+        </div>
+      </div>
+
+      <div class="topbar-rule" aria-hidden="true">
+        <span></span>
+        <i>填</i>
+        <span></span>
+      </div>
+
+      <div class="topbar-actions">
+        <p class="topbar-tip"><span class="live-dot"></span>逐字成格 · 中右对照</p>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="panel panel-source" id="sourcePanel" aria-labelledby="sourceTitle">
+        <header class="panel-head">
+          <div class="panel-heading">
+            <span class="panel-index">01</span>
+            <div>
+              <p class="panel-kicker">INPUT</p>
+              <h2 id="sourceTitle">原词</h2>
+            </div>
+          </div>
+          <div class="source-head-tools">
+            <p class="panel-stat" id="sourceStats"><strong>0</strong> 行 <i></i> <strong>0</strong> 字</p>
+            <button class="icon-button source-collapse-button" id="collapseSourceButton" type="button"
+              title="收起原词栏" aria-label="收起原词栏" aria-controls="sourcePanel" aria-expanded="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 6.5 9.5 12 15 17.5"></path>
+                <path d="M6.5 6v12"></path>
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <div class="source-body">
+          <div class="source-caption">
+            <span>输入或粘贴歌词</span>
+            <span class="source-caption-hint">回车分行 · 仅用于排版</span>
+          </div>
+          <div class="textarea-wrap">
+            <div class="source-line-numbers" aria-hidden="true">
+              <div class="source-line-number-list" id="sourceLineNumbers"></div>
+            </div>
+            <textarea id="lyricsInput" wrap="off" spellcheck="false" autocomplete="off" autocapitalize="off"
+              aria-label="原词输入框"
+              placeholder="在这里输入或粘贴歌词……
+每行生成一组字格。
+空行合并为一行空白。"></textarea>
+            <div class="editor-mark" aria-hidden="true">
+              <span></span>
+              <small>原稿</small>
+            </div>
+          </div>
+          <div class="source-foot">
+            <p><span class="foot-dot"></span>标点自动落格，可在右侧修改</p>
+            <button class="text-button" id="clearSourceButton" type="button" disabled>清空原词</button>
+          </div>
+        </div>
+      </section>
+
+      <button class="source-rail" id="expandSourceButton" type="button"
+        aria-label="展开原词栏" aria-controls="sourcePanel" aria-expanded="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M9 6.5 14.5 12 9 17.5"></path>
+          <path d="M17.5 6v12"></path>
+        </svg>
+        <span class="source-rail-label">原词</span>
+        <span class="source-rail-note">展开</span>
+      </button>
+
+      <section class="panel panel-preview" aria-labelledby="previewTitle">
+        <header class="panel-head">
+          <div class="panel-heading">
+            <span class="panel-index">02</span>
+            <div>
+              <p class="panel-kicker">REFERENCE</p>
+              <h2 id="previewTitle">对照</h2>
+            </div>
+          </div>
+          <span class="mode-pill">原文</span>
+        </header>
+
+        <div class="scroll-shell">
+          <div class="scroll-area preview-scroll" id="previewScroll" tabindex="0"
+            aria-label="原文对照，随右侧同步滚动">
+            <div class="lyrics-content" id="previewContent"></div>
+          </div>
+        </div>
+
+        <footer class="panel-foot">
+          <p class="sync-note">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 7h7.2a3.8 3.8 0 0 1 0 7.6H9.5"></path>
+              <path d="m11 11.5-3 3 3 3"></path>
+              <path d="M16 17H8.8a3.8 3.8 0 0 1 0-7.6h5.7"></path>
+            </svg>
+            与右列同步滚动
+          </p>
+          <p class="match-note">末二字 · 韵母</p>
+        </footer>
+      </section>
+
+      <section class="panel panel-fill" aria-labelledby="fillTitle">
+        <header class="panel-head">
+          <div class="panel-heading">
+            <span class="panel-index">03</span>
+            <div>
+              <p class="panel-kicker">COMPOSE</p>
+              <h2 id="fillTitle">填词</h2>
+            </div>
+          </div>
+          <div class="fill-head-tools">
+            <span class="mode-pill mode-editable"><span></span>可填写</span>
+            <button class="add-cell-button" id="addCellButton" type="button"
+              title="输入原词后可增加格子" aria-label="增加格子，选择插入位置" disabled>
+              <span aria-hidden="true">＋</span>
+              <span id="addCellLabel">增加格子</span>
+            </button>
+            <button class="add-cell-button delete-cell-button" id="deleteCellButton" type="button"
+              title="选择要删除的格子" aria-label="选择要删除的格子" disabled>
+              <span aria-hidden="true">−</span>
+              <span id="deleteCellLabel">删格</span>
+            </button>
+            <button class="reset-button" id="clearFillsButton" type="button"
+              title="重置填词与全部格子" aria-label="重置填词与全部格子" disabled>重置</button>
+          </div>
+        </header>
+
+        <div class="scroll-shell">
+          <div class="scroll-area fill-scroll" id="fillScroll" tabindex="-1"
+            aria-label="逐字填词区">
+            <div class="lyrics-content" id="fillContent"></div>
+          </div>
+        </div>
+
+        <footer class="panel-foot fill-foot">
+          <div class="progress-block">
+            <p class="progress-label"><strong id="fillRatio">0 / 0</strong><span>字已填</span></p>
+            <div class="progress-track" id="progressTrack" role="progressbar" aria-label="填词进度"
+              aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
+              <span id="progressBar"></span>
+            </div>
+          </div>
+          <div class="fill-foot-actions">
+            <button class="text-button copy-button" id="copyButton" type="button" disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="8.5" y="8.5" width="10" height="10" rx="1.6"></rect>
+                <path d="M15.5 8.5v-3h-10v10h3"></path>
+              </svg>
+              复制填词
+            </button>
+            <p class="keyboard-tip"><kbd>Tab</kbd> 跳格 · <kbd>Backspace</kbd> 回退</p>
+          </div>
+        </footer>
+      </section>
+    </main>
+
+    <footer class="app-foot">
+      <p>原词仅用于生成格律，不会被上传</p>
+      <p class="app-foot-mark">FILL THE SILENCE <span></span></p>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <noscript>
+    <div class="noscript">请启用 JavaScript 以使用填词格。</div>
+  </noscript>
+
+  <script src="vendor/pinyin-pro.js" defer></script>
+  <script src="app.js" defer></script>
+</body>
+</html>
